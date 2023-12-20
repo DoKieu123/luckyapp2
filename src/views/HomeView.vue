@@ -1,18 +1,36 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+  <HeaderList></HeaderList>
+  <AddOrder></AddOrder>
+  <AddClient></AddClient>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
-
+import HeaderList from '@/components/header/HeaderList.vue';
+import AddOrder from '@/components/order/AddOrder.vue'
+import AddClient from '@/components/addClient/AddClient.vue'
 export default {
   name: "HomeView",
-  components: {
-    HelloWorld,
+  data() {
+    return {
+    
+    }
   },
+  components: {
+   HeaderList,
+   AddOrder,
+   AddClient
+  },
+  methods:{
+   
+  }
 };
 </script>
+<style lang="scss" scoped>
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+</style>
