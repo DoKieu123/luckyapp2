@@ -178,4 +178,7 @@ export default {
       // Xử lý lỗi khi tải danh sách sản phẩm
     }
   },
+  empty(){
+    this.selectedProduct =[]
+  }
 };

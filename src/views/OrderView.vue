@@ -2,6 +2,7 @@
   <div class="about">
     <HeaderList></HeaderList>
     <TitleOrder></TitleOrder>
+
     
   </div>
 </template>
@@ -13,6 +14,7 @@ export default {
   components: {
     TitleOrder,
     HeaderList,
+
   },
 };
 </script>

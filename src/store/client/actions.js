@@ -75,11 +75,13 @@ export default {
         };
         clientdata.push(client);
       }
-      if (payload === "") {
+      if (payload === null) {
+        this.hiddenClient = false
         clientdata.forEach((item) => {
           item.hidden = false;
         });
       } else {
+        this.hiddenClient = true
         const payloadArray = Array.from(String(payload));
   
         clientdata.forEach((item) => {
@@ -107,5 +109,41 @@ export default {
       console.error("Error: ", error);
     }
   },
+  async selectedClient(payload){
+    try{
+      const response = await clientApi.getAll();
+      const responseData = response.data;
+      const clientdata = [];
+      for(const key in responseData){
+        const client = {
+          id: responseData[key].id,
+          name: responseData[key].name,
+          number: responseData[key].number,
+          hidden: responseData[key].hidden,
+          total: responseData[key].total,
+          rank: responseData[key].rank,
+        };
+        clientdata.push(client);
+      }
+      const listSelected = []
+      clientdata.forEach((item)=>{
+        if(payload === item.id){
+          listSelected.push(item)
+        }
+      })
+      this.hiddenClient = false
+      this.selectedList = listSelected
+    }
+    catch (error){
+      console.error("Error: ", error);
+      // Xử lý lỗi khi tải danh sách sản phẩm
+    }
+  },
+  empty(){
+  this.selectedList =[]
+  },
+  hiddenload(){
+    this.hiddenClient = true
+  }
 
 };

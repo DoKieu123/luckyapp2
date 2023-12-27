@@ -6,6 +6,7 @@ const useClientStore = defineStore("client", {
         return {
             client: [],
             clientdatas:[],
+            selectedList:[],
             clientadd: false,
             hiddenClient: false
         };

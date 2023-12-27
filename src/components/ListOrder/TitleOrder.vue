@@ -63,34 +63,16 @@
           </li>
         </ul>
         <ul class="item-order">
-          <li>
+          <li v-for="order in listOrder" :key="order.index">
             <i class="fa-solid fa-cloud"></i>
             <input type="checkbox" />
-            <span>SON0001</span>
+            <span>{{ order.id }}</span>
             <span
-              >27/11/2023 23:30</span
+              >{{ order.formattedDate}}</span
             >
-            <span>Mai</span>
-            <span>Hoàn thành</span>
-            <span>800000</span>
-            <ul class="btn-operation" >
-              <button>
-                <i class="fa-solid fa-circle-info"></i>
-              </button>
-              <button><i class="fa-solid fa-trash-can"></i> </button>
-              <button><i class="fa-solid fa-wrench"></i></button>
-            </ul>
-          </li>
-          <li>
-            <i class="fa-solid fa-cloud"></i>
-            <input type="checkbox" />
-            <span>SON0001</span>
-            <span
-              >27/11/2023 23:30</span
-            >
-            <span>Mai</span>
-            <span>Hoàn thành</span>
-            <span>800000</span>
+            <span v-for="client in order.client" :key="client.index" >{{ client.name }}</span>
+            <span>{{ order.method }}</span>
+            <span>{{ order.amountToPay }}</span>
             <ul class="btn-operation" >
               <button>
                 <i class="fa-solid fa-circle-info"></i>
@@ -109,6 +91,7 @@
 </template>
 
 <script>
+import useOrderStore from '@/store/order';
 import LeftItem from '@/components/leftitem/LeftItem.vue'
 export default {
   components:{
@@ -123,6 +106,9 @@ export default {
       titile: 'Danh sách đơn hàng'
     };
   },
+  created(){
+    useOrderStore().loadOrder()
+  },
   methods: {
     hiddenselected() {
       this.hidden = !this.hidden;
@@ -133,6 +119,11 @@ export default {
       this.block = false;
     },
   },
+  computed:{
+    listOrder(){
+      return useOrderStore(). ALLOrder
+    }
+  }
 };
 </script>
 
@@ -191,8 +182,6 @@ a {
       padding: 20px 30px;
       color: white;
       font-size: 18px;
-    }
-    li:hover {
     }
     .item-chone {
       border-bottom: 5px solid rgb(255, 103, 128);

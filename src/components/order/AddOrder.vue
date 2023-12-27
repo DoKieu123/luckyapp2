@@ -1,13 +1,18 @@
 <template>
   <div class="add-order">
-    <ul class="filter-product" >
+    <ul class="filter-product">
       <li v-if="hiddenname">
         <span>Tên sản phẩm</span>
         <span>Số lượng</span>
         <span>Giá</span>
       </li>
       <ul class="product-search">
-        <li  v-for="search in seachProduct" :key="search.index" :class="{'my-class': search.hiden === false, }" @click="selectedProduct(search.code)" >
+        <li
+          v-for="search in seachProduct"
+          :key="search.index"
+          :class="{ 'my-class': search.hiden === false }"
+          @click="selectedProduct(search.code)"
+        >
           <span>{{ search.name }}</span>
           <span>{{ search.quantity }}</span>
           <span>{{ search.price }}</span>
@@ -18,7 +23,12 @@
       <div class="header-product">
         <div class="input-products">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" placeholder="Thêm sản phẩm vào đơn" v-model="nameProduct" @input="search"/>
+          <input
+            type="text"
+            placeholder="Thêm sản phẩm vào đơn"
+            v-model="nameProduct"
+            @input="search"
+          />
         </div>
         <ul>
           <li>
@@ -50,25 +60,35 @@
             <li>Thành tiền</li>
           </ul>
           <ul>
-            <li class="title list-item" v-for="(item,index) in selectedList" :key="item.index">
-              <span>{{ index +1}}</span>
-              <span class="item-icons" >
+            <li
+              class="title list-item"
+              v-for="(item, index) in selectedList"
+              :key="item.index"
+            >
+              <span>{{ index + 1 }}</span>
+              <span class="item-icons">
                 <i class="fa-solid fa-trash"></i>
                 <span>{{ item.code }}</span>
-              </span >
+              </span>
               <span class="item-icon">{{ item.name }}</span>
               <span class="span-item">hộp</span>
               <span class="input-item">
-                <input type="number" v-model="item.selected"></span>
-              <span class="span-item">{{item.price}}</span>
+                <input type="number" v-model="item.selected"
+              /></span>
+              <span class="span-item">{{ item.price }}</span>
               <span class="span-item">{{ item.totalamount }}</span>
             </li>
           </ul>
         </div>
       </div>
     </div>
-    <ul class="client-list">
-      <li v-for="client in addClients" :key="client.index" :class="{'none': client.hidden === false}">
+    <ul class="client-list" v-if="listHidden">
+      <li
+        v-for="client in addClients"
+        :key="client.index"
+        :class="{ none: client.hidden === false }"
+        @click="selectedClient(client.id)"
+      >
         <i class="fa-brands fa-shopify"></i>
         <span>{{ client.name }}</span>
         <span>{{ client.number }}</span>
@@ -77,124 +97,214 @@
     <div class="add-client">
       <div class="input-client" v-if="hiddenclient">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="number" placeholder="Thêm khách hàng vào đơn" v-model="clientName" @input="searchClients" />
+        <input
+          type="number"
+          placeholder="Thêm khách hàng vào đơn"
+          v-model="clientName"
+          @input="searchClients"
+        />
         <button class="client-add" @click="AddClient">
           <i title="Thêm Khách Hàng Mới" class="fa-solid fa-plus"></i>
         </button>
       </div>
-      <div class="client-infor" v-else>
-        <div class="none-border">
-          <i class="fa-regular fa-user"></i>
-          <span>Trần Linh</span>
-        </div>
-        <i class="fa-solid fa-xmark"></i>
-      </div>
+      <ul class="client-infor" v-else>
+        <li v-for="client in listClients" :key="client.index">
+          <div class="none-border">
+            <i class="fa-regular fa-user"></i>
+            <span>{{ client.name }}</span>
+          </div>
+          <i class="fa-solid fa-xmark"></i>
+        </li>
+      </ul>
       <div class="input-delivery">
         <input type="checkbox" />
         <span>Giao Hàng</span>
       </div>
       <ul class="billing-section">
         <li>
-          <p>Tổng Tiền (0 Sản phẩm)</p>
-          <span>0</span>
+          <p>Tổng Tiền ({{ infoMony.totalItems }} Sản phẩm)</p>
+          <span>{{ infoMony.totalAmount }}</span>
         </li>
         <li>
           <p>Chiết khấu</p>
-          <span>0</span>
+          <input type="number" v-model="infoMony.discount" class="discount" />
         </li>
         <li class="bold">
           <p>Khách Phải Trả</p>
-          <span>0</span>
+          <span>{{ infoMony.amountToPay }}</span>
         </li>
         <li class="pay">
           <p>Hình Thức Thanh Toán</p>
           <ul class="payments-item">
             <li class="cash">
-              <input type="checkbox" />
+              <input type="radio" value="Tiền mặt" v-model="infoMony.method" />
               Tiền mặt
             </li>
             <li class="transfer">
-              <input type="checkbox" />
+              <input type="radio" value="Chuyển khoản" v-model="infoMony.method" />
               Chuyển khoản
             </li>
             <li class="swipe">
-              <input type="checkbox" />
+              <input type="radio" value="Quejt thẻ" v-model="infoMony.method" />
               Quẹt thẻ
             </li>
           </ul>
         </li>
         <li class="bold">
           <p>Tiền khách đưa</p>
-          <span>0</span>
+          <input
+            type="number"
+            v-model="infoMony.moneyGiven"
+            class="moneyGiven"
+          />
         </li>
         <li>
           <p>Tiền thừa trả khách</p>
-          <span>0</span>
+          <span>{{ infoMony.exchange }}</span>
         </li>
         <div class="input-client note">
           <i class="fa-solid fa-pen"></i>
           <input type="text" placeholder="Nhập ghi chú khách hàng" />
         </div>
       </ul>
-      <button class="btl-pay">Thanh Toán</button>
+      <button class="btl-pay" @click="addOrderNew">Thanh Toán</button>
     </div>
   </div>
+  <BillOrder></BillOrder>
 </template>
 
 <script>
 import useProductStore from "@/store/product";
 import useClientStore from "@/store/client";
+import useOrderStore from "@/store/order";
+import BillOrder from "@/components/bill/BillOrder.vue"
 export default {
   data() {
     return {
-      nameProduct: '',
+      nameProduct: "",
       clientName: null,
-      hiddenclient: true
-    }
+      hiddenclient: true,
+      infoMony: {
+        id:'',
+        totalAmount: 0,//tổng tiền 
+        discount: 0,//khuyến mãi
+        amountToPay: 0,//tiền khách phải trả
+        moneyGiven: 0,//tiền khách đưa
+        exchange: 0,//tiền thối lại
+        totalItems: 0,//tổng số món hàng
+        method:'',
+        currentDate: new Date(),
+        formattedDate :''
+      },
+    };
   },
+  components:{
+    BillOrder
+  },
+  created() {
+  // Gán giá trị cho formattedDate trong khi component được tạo ra
+  const currentDate = this.infoMony.currentDate;
+  this.infoMony.formattedDate = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()} ${currentDate.getHours()}:${currentDate.getMinutes()}`;
+},
   computed: {
-    seachProduct(){
-      return useProductStore().allproductSearch
+    seachProduct() {
+      return useProductStore().allproductSearch;
     },
-    hiddenname(){
-      return useProductStore().hidden
+    hiddenname() {
+      // hiện , ấn
+      return useProductStore().hidden;
     },
-    selectedList(){
-      return useProductStore().listSearch
+    selectedList() {
+      // danh sách sản phẩm được chọn
+      return useProductStore().listSearch;
     },
-    addClients(){
-      return useClientStore().clientSearch
-    }
-
+    addClients() {
+      return useClientStore().clientSearch;
+    },
+    listHidden() {
+      return useClientStore().hiddenList;
+    },
+    listClients() {
+      return useClientStore().listClient;
+    },
   },
   watch: {
     selectedList: {
       deep: true,
       handler(newValue) {
         // Xử lý khi selectedList thay đổi
-        newValue.forEach(item => {
+        newValue.forEach((item) => {
           item.totalamount = item.selected * item.price;
-          item.inventory = item.quantity - item.selected
+          item.inventory = item.quantity - item.selected;
+          this.infoMony.totalAmount += item.totalamount;
         });
-      }
+        this.infoMony.totalItems = newValue.length;
+        this.infoMony.amountToPay =
+          this.infoMony.totalAmount -
+          (this.infoMony.discount / 100) * this.infoMony.totalAmount;
+      },
+    },
+    "infoMony.discount": function (newdiscount) {
+      // Tính giá trị tiền phải trả với chiết khấu (%)
+      this.infoMony.amountToPay =
+        this.infoMony.totalAmount -
+        (newdiscount / 100) * this.infoMony.totalAmount;
+    },
+    "infoMony.moneyGiven": function (newmoneyGiven) {
+      this.infoMony.exchange = newmoneyGiven - this.infoMony.amountToPay;
     },
   },
   methods: {
     AddClient() {
       useClientStore().clientAdd();
     },
-    search(){
+    search() {
       useProductStore().seachName(this.nameProduct);
       console.log(this.hiddenname);
     },
-    selectedProduct(code){
-      useProductStore().selected(code, this.selected)
+    selectedProduct(code) {
+      useProductStore().selected(code, this.selected);
     },
-    searchClients(){
-      useClientStore().seachClient(this.clientName)
+    searchClients() {
+      useClientStore().seachClient(this.clientName);
       console.log(this.clientName);
     },
-
+    selectedClient(id) {
+      useClientStore().selectedClient(id);
+      (this.hiddenclient = false), (this.clientName = null);
+    },
+    addOrderNew() {
+      this.infoMony.id = this.generateUniqueId();
+      useOrderStore().addOrders(
+        this.selectedList,
+        this.listClients,
+        this.infoMony,
+      );
+      localStorage.setItem("id", JSON.stringify(this.infoMony.id)); // lưu id mới vào localStorage
+      useOrderStore().loadOrder();
+      useOrderStore().ALLOrder
+      useOrderStore().OrderSelected(this.infoMony.id)
+      useOrderStore().hidden()
+      useProductStore().empty()
+      useClientStore().empty()
+      this.hiddenclient = true
+      this.infoMony.totalAmount= 0,//tổng tiền 
+      this.infoMony.discount= 0,//khuyến mãi
+      this.infoMony.amountToPay= 0,//tiền khách phải trả
+      this.infoMony.moneyGiven= 0,//tiền khách đưa
+      this.infoMony.exchange= 0,//tiền thối lại
+      this.infoMony.totalItems= 0,//tổng số món hàng
+      this.infoMony.method = ''
+      
+    },
+    generateUniqueId() {
+      const randomNumber = Math.floor(Math.random() * 900).toString();
+      const uniqueId = `Order_${randomNumber}`;
+      if (uniqueId.length > 10) {
+        return uniqueId.slice(0, 10);
+      }
+      return uniqueId;
+    },
   },
 };
 </script>
@@ -216,9 +326,9 @@ a {
   position: fixed;
   top: 150px;
   left: 50px;
-  .my-class{
-      display: none;
-    }
+  .my-class {
+    display: none;
+  }
   li {
     width: 640px;
     padding: 15px 10px;
@@ -317,19 +427,19 @@ a {
         color: rgb(255, 141, 160);
         margin-right: 10px;
       }
-      .span-item{
+      .span-item {
         width: 55px;
       }
-      .item-icons{
-        width: 70px;
+      .item-icons {
+        width: 80px;
       }
-      .input-item{
-        input{
+      .input-item {
+        input {
           width: 60px;
           margin: 0px auto;
         }
       }
-      .item-icon{
+      .item-icon {
         width: 90px;
       }
       span:nth-child(4) {
@@ -360,7 +470,7 @@ a {
   justify-content: end;
   box-shadow: 5px 8px 5px rgba(21, 21, 21, 0.1);
 }
-.client-list{
+.client-list {
   position: fixed;
   top: 150px;
   right: 50px;
@@ -368,7 +478,7 @@ a {
   width: 390px;
   padding: 20px 0px;
   border-radius: 5px;
-  li{
+  li {
     width: 350px;
     margin: 0 auto;
     background-color: #f1a5c4;
@@ -377,11 +487,11 @@ a {
     color: white;
     border-radius: 20px 5px 20px 5px;
     margin-bottom: 8px;
-    span{
+    span {
       margin-left: 15px;
     }
   }
-  .none{
+  .none {
     display: none !important;
   }
 }
@@ -400,18 +510,21 @@ a {
     font-weight: 700;
     font-size: 19px;
   }
-  .client-infor{
-    display: flex;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    span{
+  .client-infor {
+    li {
+      display: flex;
+      padding-top: 22px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f67cad;
+    }
+    span {
       color: #fc77ac;
       margin-left: 8px;
     }
-    .none-border{
+    .none-border {
       border: none;
     }
-    .fa-xmark{
+    .fa-xmark {
       border-radius: 50%;
       border: 1px solid black;
       padding-top: 4px !important;
@@ -434,6 +547,18 @@ a {
     }
     .note {
       margin-top: 60px;
+    }
+    .discount {
+      border: 0px;
+      outline: none;
+      width: 40px;
+      font-size: 20px;
+    }
+    .moneyGiven {
+      border: 0px;
+      outline: none;
+      width: 120px;
+      font-size: 18px;
     }
     .payments-item {
       justify-content: center;
@@ -510,6 +635,5 @@ a {
     margin-right: 2px;
     outline: none;
   }
-  
 }
 </style>
