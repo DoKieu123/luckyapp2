@@ -1,7 +1,7 @@
 <template>
   <div class="order-list">
     <LeftItem :titile="titile"></LeftItem>
-    <div class="item-order">
+    <div class="item-orders">
       <router-link to="/" class="btn-order">
         <i class="fa-solid fa-plus"></i>
         Tạo đơn hàng
@@ -57,23 +57,22 @@
           <li>Khách Phải trả</li>
           <li>
             Thao tác
-            <!-- <button> <i class="fa-solid fa-circle-info"></i>Xem chi tiết</button>
-            <button><i class="fa-solid fa-trash-can"></i> Xóa</button>
-            <button> <i class="fa-solid fa-wrench"></i>Sửa</button> -->
           </li>
         </ul>
         <ul class="item-order">
           <li v-for="order in listOrder" :key="order.index">
-            <i class="fa-solid fa-cloud"></i>
-            <input type="checkbox" />
-            <span>{{ order.id }}</span>
-            <span
+            <span class="item-column">
+              <i class="fa-solid fa-cloud"></i>
+              <input type="checkbox" />
+            </span>
+            <span class="item-column">{{ order.id }}</span>
+            <span class="item-columns"
               >{{ order.formattedDate}}</span
             >
-            <span v-for="client in order.client" :key="client.index" >{{ client.name }}</span>
-            <span>{{ order.method }}</span>
-            <span>{{ order.amountToPay }}</span>
-            <ul class="btn-operation" >
+            <span class="item-columns" v-for="client in order.client" :key="client.index" >{{ client.name }}</span>
+            <span class="item-columns">{{ order.method }}</span>
+            <span class="item-column">{{ order.amountToPay }}</span>
+            <ul  class="btn-operation item-columns" >
               <button>
                 <i class="fa-solid fa-circle-info"></i>
               </button>
@@ -143,10 +142,16 @@ a {
   text-decoration: none;
 }
 
-.item-order {
+.item-orders {
   padding: 20px;
   width: 75%;
   margin-left: 23%;
+  position: fixed;
+  top: 75px;
+  right: 8px;
+  
+
+
   .btn-order {
     padding: 10px 37px;
     margin-left: 800px;
@@ -280,14 +285,20 @@ a {
     margin-left: 0px;
     border: 2px solid pink;
     border-radius: 0px 0px 5px 5px;
+    height: 250px;
+    overflow: auto;
     li{
+      width: 97%;
+      margin: 0 auto;
       display: flex;
+      justify-content: space-between;
       align-items: center;
       border: 2px solid rgb(255, 116, 139);
       color: rgb(255, 85, 113);
       border-radius: 10px;
       padding: 15px 0px ;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
+      margin-top: 10px;
       input{
         margin-left: 28px;
       }
@@ -297,6 +308,12 @@ a {
       i{
         width: 30px;
         padding-left: 15px;
+      }
+      .item-column{
+        max-width: 9%;
+      }
+      .item-columns{
+        max-width: 14%;
       }
     }
     .btn-operation{

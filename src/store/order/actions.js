@@ -5,7 +5,7 @@ export default {
       listProduct: payload,
       client: payloads,
       id: payloades.id,
-      totaAmount: payloades.totaAmount,
+      totalAmount: payloades.totalAmount,
       discount: payloades.discount,
       amountToPay: payloades.amountToPay,
       moneyGiven: payloades.moneyGiven,
@@ -41,7 +41,7 @@ export default {
           id: responseData[key].id,
           listProduct: responseData[key].listProduct,
           client: responseData[key].client,
-          totaAmount: responseData[key].totaAmount,
+          totalAmount: responseData[key].totalAmount,
           discount: responseData[key].discount,
           amountToPay: responseData[key].amountToPay,
           moneyGiven: responseData[key].moneyGiven,
@@ -69,7 +69,7 @@ export default {
         id: responseData[key].id,
         listProduct: responseData[key].listProduct,
         client: responseData[key].client,
-        totaAmount: responseData[key].totaAmount,
+        totalAmount: responseData[key].totalAmount,
         discount: responseData[key].discount,
         amountToPay: responseData[key].amountToPay,
         moneyGiven: responseData[key].moneyGiven,
@@ -82,20 +82,16 @@ export default {
       Orderdata.push(order);
     }
     this.orders = Orderdata;
-    console.log(this.orders);
-    console.log(payload);
-    this.orders.forEach((item)=>{
-      if(payload === item.id){
-        this.billOrder.push(item)
-      }
-    })
+    // Lọc và cập nhật this.billOrder dựa trên payload
+    this.billOrder = this.orders.filter(item => item.id === payload);
     console.log(this.billOrder);
-    
   } catch (error) {
     console.error("Error: ", error);
   }
   },
   hidden() {
-    this.hiddenBill = true;
+    this.hiddenBill = !this.hiddenBill;
+    console.log(this.hiddenBill);
   },
+  
 };

@@ -14,7 +14,7 @@
           @click="selectedProduct(search.code)"
         >
           <span>{{ search.name }}</span>
-          <span>{{ search.quantity }}</span>
+          <span>{{ search.quantitycheck }}</span>
           <span>{{ search.price }}</span>
         </li>
       </ul>
@@ -45,11 +45,11 @@
         </ul>
       </div>
       <div class="product-item">
-        <div class="not-product" style="display: none">
+        <div class="not-product" v-if="hasProduct">
           <i class="fa-solid fa-box-open"></i>
           <p>Đơn hàng của bạn chưa có sản phẩm nào</p>
         </div>
-        <div class="has-product">
+        <div class="has-product" v-else>
           <ul class="title header-name">
             <li>STT</li>
             <li>Mã</li>
@@ -73,7 +73,10 @@
               <span class="item-icon">{{ item.name }}</span>
               <span class="span-item">hộp</span>
               <span class="input-item">
-                <input type="number" v-model="item.selected"
+                <input
+                  type="number"
+                  v-model="item.selected"
+                  @input="changQuantity(item.id, item.selected)"
               /></span>
               <span class="span-item">{{ item.price }}</span>
               <span class="span-item">{{ item.totalamount }}</span>
@@ -87,7 +90,7 @@
         v-for="client in addClients"
         :key="client.index"
         :class="{ none: client.hidden === false }"
-        @click="selectedClient(client.id)"
+        @click="selectedClient(client.code)"
       >
         <i class="fa-brands fa-shopify"></i>
         <span>{{ client.name }}</span>
@@ -141,7 +144,11 @@
               Tiền mặt
             </li>
             <li class="transfer">
-              <input type="radio" value="Chuyển khoản" v-model="infoMony.method" />
+              <input
+                type="radio"
+                value="Chuyển khoản"
+                v-model="infoMony.method"
+              />
               Chuyển khoản
             </li>
             <li class="swipe">
@@ -167,7 +174,14 @@
           <input type="text" placeholder="Nhập ghi chú khách hàng" />
         </div>
       </ul>
-      <button class="btl-pay" @click="addOrderNew">Thanh Toán</button>
+      <button class="btl-pay" @click="addOrderNew()">Thanh Toán</button>
+      <p style="display: none;"
+        :class="{
+          red: IsPay === false,
+        }"
+      >
+        Thiếu thông tin đơn hàng ,Vui lòng nhập lại !
+      </p>
     </div>
   </div>
   <BillOrder></BillOrder>
@@ -177,35 +191,40 @@
 import useProductStore from "@/store/product";
 import useClientStore from "@/store/client";
 import useOrderStore from "@/store/order";
-import BillOrder from "@/components/bill/BillOrder.vue"
+import BillOrder from "@/components/bill/BillOrder.vue";
 export default {
   data() {
     return {
       nameProduct: "",
       clientName: null,
       hiddenclient: true,
+      hasProduct: true,
+      idClient: "",
       infoMony: {
-        id:'',
-        totalAmount: 0,//tổng tiền 
-        discount: 0,//khuyến mãi
-        amountToPay: 0,//tiền khách phải trả
-        moneyGiven: 0,//tiền khách đưa
-        exchange: 0,//tiền thối lại
-        totalItems: 0,//tổng số món hàng
-        method:'',
+        id: "",
+        totalAmount: 0, //tổng tiền
+        discount: 0, //khuyến mãi
+        amountToPay: 0, //tiền khách phải trả
+        moneyGiven: 0, //tiền khách đưa
+        exchange: 0, //tiền thối lại
+        totalItems: 0, //tổng số món hàng
+        method: "",
         currentDate: new Date(),
-        formattedDate :''
+        formattedDate: "",
       },
+      IsPay: true,
     };
   },
-  components:{
-    BillOrder
+  components: {
+    BillOrder,
   },
   created() {
-  // Gán giá trị cho formattedDate trong khi component được tạo ra
-  const currentDate = this.infoMony.currentDate;
-  this.infoMony.formattedDate = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()} ${currentDate.getHours()}:${currentDate.getMinutes()}`;
-},
+    // Gán giá trị cho formattedDate trong khi component được tạo ra
+    const currentDate = this.infoMony.currentDate;
+    this.infoMony.formattedDate = `${currentDate.getDate()}/${
+      currentDate.getMonth() + 1
+    }/${currentDate.getFullYear()} ${currentDate.getHours()}:${currentDate.getMinutes()}`;
+  },
   computed: {
     seachProduct() {
       return useProductStore().allproductSearch;
@@ -227,15 +246,15 @@ export default {
     listClients() {
       return useClientStore().listClient;
     },
+    //
   },
   watch: {
     selectedList: {
       deep: true,
       handler(newValue) {
-        // Xử lý khi selectedList thay đổi
         newValue.forEach((item) => {
           item.totalamount = item.selected * item.price;
-          item.inventory = item.quantity - item.selected;
+          // item.quantitycheck = item.quantity - item.selected
           this.infoMony.totalAmount += item.totalamount;
         });
         this.infoMony.totalItems = newValue.length;
@@ -264,38 +283,53 @@ export default {
     },
     selectedProduct(code) {
       useProductStore().selected(code, this.selected);
+      this.hasProduct = false;
     },
     searchClients() {
       useClientStore().seachClient(this.clientName);
       console.log(this.clientName);
     },
     selectedClient(id) {
+      this.idClient = id;
+      console.log(this.idClient);
       useClientStore().selectedClient(id);
       (this.hiddenclient = false), (this.clientName = null);
     },
-    addOrderNew() {
+    async addOrderNew() {
+      if (
+        this.selectedList.length === 0 ||
+        this.listClients.length === 0 ||
+        this.infoMony.moneyGiven < this.infoMony.amountToPay||
+        this.infoMony.method ==="" 
+      ) {
+        this.IsPay = false;
+        return; // Dừng lại nếu có bất kỳ điều kiện nào không thỏa mãn
+      }
       this.infoMony.id = this.generateUniqueId();
-      useOrderStore().addOrders(
+      await useOrderStore().addOrders(
         this.selectedList,
         this.listClients,
-        this.infoMony,
+        this.infoMony
       );
-      localStorage.setItem("id", JSON.stringify(this.infoMony.id)); // lưu id mới vào localStorage
-      useOrderStore().loadOrder();
-      useOrderStore().ALLOrder
-      useOrderStore().OrderSelected(this.infoMony.id)
-      useOrderStore().hidden()
-      useProductStore().empty()
-      useClientStore().empty()
-      this.hiddenclient = true
-      this.infoMony.totalAmount= 0,//tổng tiền 
-      this.infoMony.discount= 0,//khuyến mãi
-      this.infoMony.amountToPay= 0,//tiền khách phải trả
-      this.infoMony.moneyGiven= 0,//tiền khách đưa
-      this.infoMony.exchange= 0,//tiền thối lại
-      this.infoMony.totalItems= 0,//tổng số món hàng
-      this.infoMony.method = ''
-      
+      this.IsPay = true;
+      //cập nhập số lượng các sản phẩm đã được mua trong đơn hàng
+      await useProductStore().updateNumber(this.selectedList);
+      await useOrderStore().loadOrder();
+      useOrderStore().ALLOrder;
+      await useOrderStore().OrderSelected(this.infoMony.id);
+      useProductStore().empty();
+      useClientStore().empty();
+      await useClientStore().total(this.idClient, this.infoMony.totalAmount);
+      this.hiddenclient = true;
+      (this.infoMony.totalAmount = 0), //tổng tiền
+        (this.infoMony.discount = 0), //khuyến mãi
+        (this.infoMony.amountToPay = 0), //tiền khách phải trả
+        (this.infoMony.moneyGiven = 0), //tiền khách đưa
+        (this.infoMony.exchange = 0), //tiền thối lại
+        (this.infoMony.totalItems = 0), //tổng số món hàng
+        (this.infoMony.method = "");
+      useOrderStore().hidden();
+      // trừ số lượng sản phẩm khi thanh toán
     },
     generateUniqueId() {
       const randomNumber = Math.floor(Math.random() * 900).toString();
@@ -304,6 +338,9 @@ export default {
         return uniqueId.slice(0, 10);
       }
       return uniqueId;
+    },
+    changQuantity(dataId, selected) {
+      useProductStore().updateQuantity(dataId, selected);
     },
   },
 };
@@ -405,6 +442,7 @@ a {
     opacity: 0.5;
   }
   .has-product {
+    overflow: auto;
     .title {
       width: 100%;
       display: flex;
@@ -614,6 +652,13 @@ a {
       font-size: 25px;
       color: pink;
     }
+  }
+  .red {
+    display: block !important;
+    color: red;
+    position: fixed;
+    bottom: 130px;
+    right: 40px;
   }
 }
 .input-products {

@@ -8,7 +8,7 @@ const useProductStore = defineStore("product", {
             ],
             productSearch: [],
             selectedProduct: [],
-            hiddenSearch: false
+            hiddenSearch: false,
         };
     },
     getters,

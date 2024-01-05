@@ -1,78 +1,84 @@
 <template>
-  <div v-if="bock">
-    <div id="bill" v-for="bill in allBill" :key="bill.index" >
-      <div class="title-header date-code" >
-        <div><span>Số:</span> <span>{{ bill.id }}</span></div>
-        <div><span>Ngày:</span> <span>{{ bill.formattedDate }}</span></div>
-      </div>
-      <h2>HÓA ĐƠN BÁN HÀNG</h2>
-      <div class="conten-bill">
-        <ul class="bill-clien" >
-          <li v-for="clien in bill.client" :key="clien.index">
-            <div class="li-client">
-              <span>Khách hàng:</span>
-              <span class="titil-client">{{ clien.name }}</span>
-            </div>
-            <div class="li-client">
-              <span>Số điện thoại :</span>
-              <span class="titil-client">{{ clien.number }}</span>
-            </div>
-          </li>
-        </ul>
-        <ul class="product-bill title-product">
-          <li>SL</li>
-          <li>Đơn Giá</li>
-          <li>Thành Tiền</li>
-        </ul>
-        <ul class="list-product" >
-         <li class="product-bill" v-for="product in bill.listProduct" :key="product.id" >
-              <div>
-                <span class="name-product">{{ product.name }}</span>
-                <span>{{ product.selected }}</span>
+ <baseDailog v-show="bock" @close="listShow">
+    <div @click.stop>
+      <div id="bill" v-for="bill in allBill" :key="bill.index" >
+        <div class="title-header date-code" >
+          <div><span>Số:</span> <span>{{ bill.id }}</span></div>
+          <div><span>Ngày:</span> <span>{{ bill.formattedDate }}</span></div>
+        </div>
+        <h2>HÓA ĐƠN BÁN HÀNG</h2>
+        <div class="conten-bill">
+          <ul class="bill-clien" >
+            <li v-for="clien in bill.client" :key="clien.index">
+              <div class="li-client">
+                <span>Khách hàng:</span>
+                <span class="titil-client">{{ clien.name }}</span>
               </div>
-              <div>{{ product.price }}</div>
-              <div>{{ product.price }}</div>
-         </li>
-        </ul>
-        <ul class="total-bill">
-          <li>
-            <span>Cộng tiền hàng</span>
-            <span>{{ bill.totaAmount }}</span>
-          </li>
-          <li>
-            <span>Chiết khấu </span>
-              <span>{{ bill.discount }} %</span>
-          </li>
-          <li class="bold">
-            <span>Khách phải trả</span>
-            <span>{{ bill.amountToPay }}</span>
-          </li>
-          <li>
-            <span>Tiền khách đưa</span>
-            <span>{{ bill.moneyGiven }}</span>
-          </li>
-          <li>
-            <span>Trả lại</span>
-            <span>{{ bill.exchange }}</span>
-          </li>
-          <li>
-            <span>Phương thức thanh toán</span>
-            <span>{{ bill.method }}</span>
-          </li>
-        </ul>
-        <h3>Cảm ơn quý khách.Hẹn gặp lại!</h3>
+              <div class="li-client">
+                <span>Số điện thoại :</span>
+                <span class="titil-client">{{ clien.number }}</span>
+              </div>
+            </li>
+          </ul>
+          <ul class="product-bill title-product">
+            <li>SL</li>
+            <li>Đơn Giá</li>
+            <li>Thành Tiền</li>
+          </ul>
+          <ul class="list-product" >
+           <li class="product-bill" v-for="product in bill.listProduct" :key="product.id" >
+                <div>
+                  <span class="name-product">{{ product.name }}</span>
+                  <span>{{ product.selected }}</span>
+                </div>
+                <div>{{ product.price }}</div>
+                <div>{{ product.totalamount }}</div>
+           </li>
+          </ul>
+          <ul class="total-bill">
+            <li>
+              <span>Cộng tiền hàng</span>
+              <span>{{ bill.totalAmount }}</span>
+            </li>
+            <li>
+              <span>Chiết khấu </span>
+                <span>{{ bill.discount }} %</span>
+            </li>
+            <li class="bold">
+              <span>Khách phải trả</span>
+              <span>{{ bill.amountToPay }}</span>
+            </li>
+            <li>
+              <span>Tiền khách đưa</span>
+              <span>{{ bill.moneyGiven }}</span>
+            </li>
+            <li>
+              <span>Trả lại</span>
+              <span>{{ bill.exchange }}</span>
+            </li>
+            <li>
+              <span>Phương thức thanh toán</span>
+              <span>{{ bill.method }}</span>
+            </li>
+          </ul>
+          <h3>Cảm ơn quý khách.Hẹn gặp lại!</h3>
+        </div>
       </div>
     </div>
-  </div>
+ </baseDailog>
 </template>
 <script>
 import useOrderStore from "@/store/order"
+import baseDailog from "@/components/UI/baseDailog.vue";
 export default {
     props:[],
     data() {
         return {
             blocks: true
         }
+    },
+    components:{
+      baseDailog
     },
     computed:{
     bock(){
@@ -85,6 +91,9 @@ export default {
     methods:{
       abc(){
         console.log(this.allBill);
+      },
+      listShow(){
+        useOrderStore().hidden()
       }
     }
 };

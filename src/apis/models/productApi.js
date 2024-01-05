@@ -15,6 +15,10 @@ const productApi = {
     const url = `/${SCHEMA}.json`;
     return axiosClient.patch(url, JSON.stringify(data));
   },
+  updateById(id,data) {
+    const url = `/${SCHEMA}/${id}.json`;
+    return axiosClient.patch(url,data);
+  },
 };
 
 export default productApi;

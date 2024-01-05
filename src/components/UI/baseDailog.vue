@@ -17,7 +17,7 @@ div { // màn phủ toàn màn hình
   left: 0;
   height: 100vh;
   width: 100%;
-  background-color: rgba(0, 0, 0, 0.75);
+  background-color: rgba(160, 159, 159, 0.75);
   z-index: 10;
 }
 

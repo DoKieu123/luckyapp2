@@ -44,6 +44,7 @@ export default {
       const clientdata = [];
       for (const key in responseData) {
         const client = {
+          code: key,
           id: responseData[key].id,
           name: responseData[key].name,
           number: responseData[key].number,
@@ -66,6 +67,7 @@ export default {
 
       for (const key in responseData) {
         const client = {
+          code: key,
           id: responseData[key].id,
           name: responseData[key].name,
           number: responseData[key].number,
@@ -116,6 +118,7 @@ export default {
       const clientdata = [];
       for(const key in responseData){
         const client = {
+          code: key,
           id: responseData[key].id,
           name: responseData[key].name,
           number: responseData[key].number,
@@ -127,7 +130,7 @@ export default {
       }
       const listSelected = []
       clientdata.forEach((item)=>{
-        if(payload === item.id){
+        if(payload === item.code){
           listSelected.push(item)
         }
       })
@@ -144,6 +147,46 @@ export default {
   },
   hiddenload(){
     this.hiddenClient = true
+  },
+  async total(id,total){
+    try{
+      const response = await clientApi.getAll();
+      const responseData = response.data;
+      const clientdata = [];
+      for(const key in responseData){
+        const client = {
+          code: key,
+          id: responseData[key].id,
+          name: responseData[key].name,
+          number: responseData[key].number,
+          hidden: responseData[key].hidden,
+          total: responseData[key].total,
+          rank: responseData[key].rank,
+        };
+        clientdata.push(client);
+      }
+      const targetClient = clientdata.find(client => client.code === id);
+
+      if (targetClient) {
+        // Cập nhật thuộc tính total của đối tượng đó
+        targetClient.total += total;
+        if (targetClient.total <= 1000000 || targetClient.total === 0) {
+          targetClient.rank = "Đồng";
+        } else if (1000000 < targetClient.total && targetClient.total <= 2000000) {
+          targetClient.rank = "Bạc";
+        } else if (2000000 < targetClient.total && targetClient.total <= 8000000) {
+          targetClient.rank = "Vàng";
+        } else {
+          targetClient.rank = "Vip";
+        }
+        // Gửi yêu cầu cập nhật thông tin lên server
+        await clientApi.updateById(id, { total: targetClient.total, rank: targetClient.rank  });
+      }
+    }
+    catch (error){
+      console.error("Error: ", error);
+      // Xử lý lỗi khi tải danh sách sản phẩm
+    }
   }
 
 };
